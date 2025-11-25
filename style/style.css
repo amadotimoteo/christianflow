@@ -1,0 +1,86 @@
+/* --- Novo Toggle Switch CSS --- */
+.switch {
+    --switch-bg-light: #6366F1; /* Primary do Portfólio */
+    --switch-bg-dark: #18181B; /* Dark Card BG */
+    --switch-circle: #fff;
+    --switch-icon-inactive: #A5B4FC; /* Accent do Portfólio */
+    --switch-icon-active: #fff;
+    --switch-duration: 0.25s;
+    
+    display: inline-flex;
+    position: relative;
+    cursor: pointer;
+    background-color: var(--switch-bg-light);
+    border-radius: 999px;
+    height: 32px;
+    width: 60px;
+    transition: background-color var(--switch-duration) ease-out;
+}
+.switch__input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+.switch__icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    fill: none;
+    pointer-events: none;
+    transition: opacity var(--switch-duration) ease-out;
+}
+/* Estilo do círculo/thumb */
+.switch::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: var(--switch-circle);
+    transition: transform var(--switch-duration) cubic-bezier(0.785, 0.135, 0.15, 0.86);
+}
+
+/* Posição inicial (Light Mode / Desmarcado) */
+.switch__icon--light {
+    left: 10px;
+    color: var(--switch-icon-active);
+    opacity: 1;
+}
+.switch__icon--dark {
+    right: 10px;
+    color: var(--switch-icon-inactive);
+    opacity: 0;
+}
+
+/* Estado Ativo (Dark Mode / Marcado) */
+.switch__input:checked + .switch__icon--light {
+    opacity: 0;
+}
+.switch__input:checked + .switch__icon--dark {
+    opacity: 1;
+}
+.switch__input:checked ~ .switch::before {
+    transform: translateX(28px);
+}
+.switch__input:checked ~ .switch {
+    background-color: var(--switch-bg-dark);
+}
+/* Acessibilidade */
+.switch__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+/* --- Fim do Novo Toggle Switch CSS --- */
+
+
+

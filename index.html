@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Música e Devocional (Estética do Portfólio)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class', 
+            theme: {
+                extend: {
+                    colors: {
+                        // Paleta do Portfólio (Código 1)
+                        primary: "#6366F1",      // azul violeta
+                        secondary: "#8B5CF6",    // violeta claro
+                        accent: "#A5B4FC",       // lilás suave (usado para destaque principal)
+                        
+                        // Mapeamento para Light Mode
+                        'bg-default': '#C1C8E4', // NOVO BACKGROUND SUAVE
+                        'bg-card': '#ffffff',    // Light Mode Card (mantido branco para contraste)
+                        'text-default': '#1e293b', 
+                        'text-secondary': '#64748b', 
+                        'border-default': '#e5e7eb', 
+
+                        // Dark Mode (Fundo do Portfólio)
+                        'dark-bg-default': "#0F0F12", // bgdark
+                        'dark-bg-card': "#18181B",    // bgsoft
+                        'dark-text-default': "#E5E7EB", 
+                        'dark-text-secondary': "#9CA3AF", 
+                        'dark-border-default': "#6366F120", // primary/20
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        title: ['Urbanist', 'sans-serif'], 
+                    },
+                    boxShadow: {
+                        // Efeito de sombra sutil usando a cor Primary do Portfólio
+                        'glow-sm': `0 0 5px #6366F140`,
+                        'glow-md': `0 0 15px #6366F160`,
+                        // Efeito de glow para o botão de Play/Pause
+                        'glow-lg-primary': '0 10px 30px rgba(99, 102, 241, 0.5)', // Cor Primary
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Urbanist:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Estilos base do corpo e classes de interatividade */
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        h1, h2, h3, .font-title {
+            font-family: 'Urbanist', sans-serif; /* Aplica a fonte de título do portfólio */
+        }
+
+        /* 🌟 Vibe do background (Hero BG) aplicada no Dark Mode 🌟 */
+        .dark body {
+            background-image:
+                radial-gradient(at 30% 70%, rgba(99, 102, 241, 0.25) 0px, transparent 50%),
+                radial-gradient(at 80% 20%, rgba(139, 92, 246, 0.20) 0px, transparent 60%),
+                linear-gradient(#0F0F12, #0F0F12);
+            
+            background-color: #0F0F12; /* Fallback e base */
+        }
+        
+        /* Estilos de interatividade para o card (Mantidos) */
+        .interactive-card {
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+        }
+        .interactive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-color: #6366F1; /* Primary do Portfólio no hover */
+        }
+        .dark .interactive-card:hover {
+            /* Efeito glow do portfólio (shadow-lg shadow-primary/40) */
+            box-shadow: 0 4px 15px #6366F160; 
+            border-color: #8B5CF6; /* Secondary do Portfólio no dark mode */
+        }
+
+        .interactive-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .interactive-button:hover {
+            filter: brightness(1.1);
+            transform: scale(1.02);
+        }
+        .interactive-button:active {
+            transform: scale(0.98);
+        }
+
+        /* Estilo da barra de progresso */
+        .progress-bar-container {
+            height: 6px;
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        
+        /* Ajuste para a imagem da capa do álbum */
+        .album-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            border-radius: inherit; 
+        }
+
+        /* --- Novo Toggle Switch CSS com Gradientes (Vibe do Portfólio) --- */
+        .switch {
+            /* Gradiente para Light Mode (Amarelo/Azul - Vibe mais clara e quente) */
+            background-image: linear-gradient(to right, #FFD700 0%, #A5B4FC 100%); /* Amarelo/Accent */
+            --switch-bg-dark: #18181B; /* Dark Card BG */
+            --switch-circle-light: #fff;
+            --switch-circle-dark: #0F0F12; /* Cor de fundo do Dark Mode */
+            --switch-icon-inactive: #fff;
+            --switch-icon-active: #fff; /* Ícones sempre brancos */
+            --switch-duration: 0.25s;
+            
+            display: inline-flex;
+            position: relative;
+            cursor: pointer;
+            border-radius: 999px;
+            height: 32px;
+            width: 60px;
+            transition: background-image var(--switch-duration) ease-out; /* Transição no background-image */
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .switch__input {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0;
+        }
+        .switch__icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            fill: none;
+            stroke: var(--switch-icon-active); /* Garante que os SVGs são brancos */
+            pointer-events: none;
+            transition: opacity var(--switch-duration) ease-out;
+        }
+        /* Estilo do círculo/thumb */
+        .switch::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background-color: var(--switch-circle-light); /* Padrão: Branco */
+            border: 2px solid transparent; /* Para dar um pequeno contorno se necessário */
+            transition: transform var(--switch-duration) cubic-bezier(0.785, 0.135, 0.15, 0.86), background-color var(--switch-duration) ease-out;
+        }
+
+        /* Posição inicial (Light Mode / Desmarcado) - Lua na direita (visível), Sol na esquerda (invisível) */
+        .switch__icon--light {
+            left: 10px;
+            opacity: 0; /* Sol começa inativo */
+        }
+        .switch__icon--dark {
+            right: 10px;
+            opacity: 1; /* Lua começa ativo */
+            stroke: #fff;
+        }
+        /* Thumb na posição 'Light' */
+        .switch:not(.dark-mode)::before {
+            transform: translateX(0);
+        }
+
+        /* Estado Ativo (Dark Mode / Marcado) */
+        /* Quando marcado, move o thumb e inverte a opacidade dos ícones */
+        .switch__input:checked + .switch__icon--light {
+            opacity: 1; /* Sol ativo */
+        }
+        .switch__input:checked ~ .switch__icon--dark {
+            opacity: 0; /* Lua inativa */
+        }
+        /* Move o thumb para a direita */
+        .switch__input:checked ~ .switch::before {
+            transform: translateX(28px);
+        }
+        
+        /* Quando o Dark Mode está ativado (corpo possui classe 'dark') */
+        .dark .switch {
+            /* Gradiente para Dark Mode (Roxo/Azul - Primary/Secondary do Portfólio) */
+            background-image: linear-gradient(to right, #6366F1 0%, #8B5CF6 100%); /* Primary/Secondary */
+            box-shadow: 0 0 5px #6366F140; /* Um pouco de glow */
+        }
+        /* O thumb se torna preto (dark-bg-default) quando no modo dark (posição 'dark') */
+        .dark .switch::before {
+            background-color: var(--switch-circle-dark); /* Fundo preto/dark-bg-default */
+        }
+
+        /* A cor da borda do thumb (circulo) quando no modo dark e na posição direita */
+        .dark .switch__input:checked ~ .switch::before {
+            /* Borda sutil de Secondary (a cor que está na direita do gradiente) */
+            border-color: #8B5CF6; 
+        }
+        
+        /* Acessibilidade */
+        .switch__sr {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        /* --- Fim do Novo Toggle Switch CSS com Gradientes --- */
+    </style>
+</head>
+<body class="bg-bg-default dark:bg-dark-bg-default text-text-default dark:text-dark-text-default font-sans">
+
+    <div id="app-container" class="flex-grow">
+        </div>
+    
+    <nav class="fixed bottom-0 left-0 right-0 bg-bg-card dark:bg-dark-bg-card border-t border-border-default dark:border-dark-border-default shadow-2xl z-20 p-1">
+        <div class="flex justify-around py-1">
+            <button onclick="navigateTo('player')" class="flex flex-col items-center p-2 rounded-lg transition hover:bg-border-default dark:hover:bg-dark-border-default hover:text-primary interactive-button" data-view="player">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+            </button>
+            <button onclick="navigateTo('player')" class="flex flex-col items-center p-2 rounded-lg transition hover:bg-border-default dark:hover:bg-dark-border-default hover:text-primary interactive-button" data-view="player-alt">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <button onclick="navigateTo('community-hub')" class="flex flex-col items-center p-2 rounded-lg transition hover:bg-border-default dark:hover:bg-dark-border-default hover:text-primary interactive-button" data-view="community-hub">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                </svg>
+            </button>
+            <button onclick="navigateTo('player')" class="flex flex-col items-center p-2 rounded-lg transition hover:bg-border-default dark:hover:bg-dark-border-default hover:text-primary interactive-button" data-view="market">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <template id="player-view">
+        <main class="p-4 sm:p-6 overflow-y-auto" style="padding-bottom: 5rem;">
+            
+            <audio id="audioPlayer" src="audio/bartimeu.mp3"></audio>
+
+            <header class="flex justify-between items-center mb-6">
+                <a href="#" class="text-text-secondary dark:text-dark-text-secondary flex items-center space-x-1 font-medium hover:text-primary transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span class="hidden sm:inline">Voltar para o Feed</span>
+                </a>
+                
+                <div class="flex items-center space-x-3">
+                    <button class="p-2 rounded-full text-text-secondary dark:text-dark-text-secondary hover:text-primary hover:bg-border-default dark:hover:bg-dark-border-default transition interactive-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                        </svg>
+                    </button>
+                    
+                    <label class="switch" id="themeTogglePlayer">
+                        <input class="switch__input" type="checkbox" role="switch">
+                        <svg class="switch__icon switch__icon--light" viewBox="0 0 12 12" width="12px" height="12px" aria-hidden="true">
+                            <g fill="none" stroke="#fff" stroke-width="1" stroke-linecap="round">
+                                <circle cx="6" cy="6" r="2" />
+                                <g stroke-dasharray="1.5 1.5">
+                                    <polyline points="6 10,6 11.5" transform="rotate(0,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(45,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(90,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(135,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(180,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(225,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(270,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(315,6,6)" />
+                                </g>
+                            </g>
+                        </svg>
+                        <svg class="switch__icon switch__icon--dark" viewBox="0 0 12 12" width="12px" height="12px" aria-hidden="true">
+                            <g fill="none" stroke="#fff" stroke-width="1" stroke-linejoin="round" transform="rotate(-45,6,6)">
+                                <path d="m9,10c-2.209,0-4-1.791-4-4s1.791-4,4-4c.304,0,.598.041.883.105-.995-.992-2.367-1.605-3.883-1.605C2.962.5.5,2.962.5,6s2.462,5.5,5.5,5.5c1.516,0,2.888-.613,3.883-1.605-.285.064-.578.105-.883.105Z"/>
+                            </g>    
+                        </svg>
+                        <span class="switch__sr">Dark Mode</span>
+                    </label>
+                </div>
+            </header>
+
+            <section class="mb-8 p-6 bg-bg-card dark:bg-dark-bg-card rounded-3xl shadow-xl interactive-card border border-border-default dark:border-dark-border-default">
+                
+                <div class="w-56 h-56 mx-auto bg-border-default dark:bg-dark-border-default rounded-xl mb-6 shadow-2xl flex items-center justify-center relative z-10 border-2 border-primary/50 overflow-hidden">
+                    <img src="imagem/bartimeu.jpg" alt="Capa do Single Bartimeu" class="album-cover">
+                </div>
+                
+                <div class="text-center mb-5">
+                    <h2 class="text-3xl font-bold font-title tracking-tight text-accent">Bartimeu</h2>
+                    <p class="text-sm font-light opacity-80 mt-1 text-secondary dark:text-dark-text-secondary">2metro | 2024</p>
+                </div>
+
+                <div class="progress-bar-container mb-2 bg-border-default dark:bg-dark-border-default relative z-10">
+                    <div class="progress-bar-fill bg-secondary dark:bg-secondary/70" id="progressBarFill" style="width: 0%;"></div>
+                    <div class="absolute top-1/2 -mt-2 w-4 h-4 bg-primary rounded-full shadow-lg border-2 border-bg-card dark:border-dark-bg-card" id="progressThumb" style="left: calc(0% - 8px);"></div>
+                </div>
+                <div class="flex justify-between text-xs text-text-secondary dark:text-dark-text-secondary/80 mb-8 relative z-10">
+                    <span id="currentTime">00:00</span>
+                    <span id="durationTime">00:00</span>
+                </div>
+
+                <div class="flex justify-center items-center space-x-6 relative z-10">
+                    <button class="p-3 rounded-full interactive-button text-secondary dark:text-secondary/90 hover:text-primary bg-bg-default dark:bg-dark-bg-default shadow-glow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                    
+                    <button id="playPauseButton" onclick="window.togglePlayPause()" class="p-4 rounded-full interactive-button bg-primary text-white shadow-glow-lg-primary"> 
+                        <svg id="playIcon" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v14zM16 5v14H8V5h8z"/>
+                        </svg>
+    <svg id="pauseIcon" class="h-8 w-8 hidden" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v14zM16 5v14H8V5h8z"/>
+    </svg>
+</button>
+                    </button>
+                    
+                    <button class="p-3 rounded-full interactive-button text-secondary dark:text-secondary/90 hover:text-primary bg-bg-default dark:bg-dark-bg-default shadow-glow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="flex justify-between items-center mt-6 text-text-secondary dark:text-dark-text-secondary text-sm">
+                    <button class="flex items-center space-x-1 hover:text-primary transition interactive-button">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                 <path fill-rule="evenodd" d="M18 3a1 1 0 00-1.447-.894L11 6l-2-2v4a1 1 0 001 1h4a1 1 0 001-1V5l2.447 1.342A1 1 0 0018 5V3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM12 18a2 2 0 11-4 0 2 2 0 014 0zM6 18a2 2 0 11-4 0 2 2 0 014 0z" clip-rule="evenodd" />
+                             </svg>
+                             <span>Playlist</span>
+                    </button>
+                    <button class="hover:text-red-500 transition interactive-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <section class="mt-8">
+                <h2 class="text-2xl font-bold font-title mb-4 text-primary dark:text-accent">Aprofunde-se na Mensagem</h2>
+
+                <div class="flex border-b border-border-default dark:border-dark-border-default mb-6 text-sm sm:text-base font-medium overflow-x-auto whitespace-nowrap">
+                    <button class="pb-3 px-4 border-b-2 border-primary text-primary transition duration-150 ease-in-out">Devocional</button>
+                    <button class="pb-3 px-4 border-b-2 border-transparent text-text-secondary/80 dark:text-dark-text-secondary/80 hover:text-primary transition duration-150 ease-in-out interactive-button">Notas do Artista</button>
+                    <button class="pb-3 px-4 border-b-2 border-transparent text-text-secondary/80 dark:text-dark-text-secondary/80 hover:text-primary transition duration-150 ease-in-out interactive-button">Letra</button>
+                    <button class="pb-3 px-4 border-b-2 border-transparent text-text-secondary/80 dark:text-dark-text-secondary/80 hover:text-primary transition duration-150 ease-in-out interactive-button">Plano de Leitura</button>
+                </div>
+
+                <div class="bg-bg-card dark:bg-dark-bg-card rounded-xl p-5 sm:p-6 shadow-md interactive-card border border-border-default dark:border-dark-border-default">
+                    
+                    <h3 class="text-xl sm:text-2xl font-extrabold font-title mb-4 text-secondary">Estudo Bíblico: O Chamado e a Visão de Bartimeu</h3>
+                    <p class="text-sm font-medium text-text-secondary/90 dark:text-dark-text-secondary/90 mb-4">Baseado em Marcos 10:46-52 e no Single "Bartimeu"</p>
+                    
+                    <div class="bg-border-default dark:bg-dark-border-default p-4 rounded-lg border-l-4 border-primary mb-4 text-text-default dark:text-dark-text-default/90 italic">
+                        <p class="font-semibold">"Então Jesus lhe perguntou: ‘O que você quer que eu lhe faça?’ O cego respondeu: ‘Mestre, eu quero ver!’"</p>
+                        <p class="text-right text-xs mt-2">— Marcos 10:51</p>
+                    </div>
+                    
+                    <p class="text-text-secondary dark:text-dark-text-default/80 text-base leading-relaxed mb-4">
+                        A música de 2metro nos coloca na pele de Bartimeu, o mendigo cego de Jericó. Não é apenas a história de uma cura física, mas de um **clamor determinado** e uma **fé que age**. O ponto central é a pergunta de Jesus: "O que você quer que eu lhe faça?". Bartimeu não hesita em sua resposta.
+                    </p>
+                    
+                    <p class="text-text-secondary dark:text-dark-text-default/80 text-base leading-relaxed mb-6">
+                        Este estudo explora a coragem de Bartimeu ao gritar, apesar das repreensões da multidão. Reflete sobre o que significa "lançar fora a capa" (abandonar a antiga identidade) e, crucialmente, o que significa **"seguir Jesus pelo caminho"** após receber a nova visão. O que estamos dispostos a largar para responder ao chamado de Cristo?
+                    </p>
+
+                    <button onclick="navigateTo('community-hub')" class="w-full py-3 bg-primary text-white rounded-xl font-bold text-sm tracking-wider shadow-lg transition duration-200 hover:opacity-90 flex items-center justify-center space-x-2 interactive-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9H7v2h2V9z" clip-rule="evenodd" />
+                        </svg>
+                        <span>DISCUTIR O CHAMADO DE BARTIMEU NA COMUNIDADE</span>
+                    </button>
+                </div>
+            </section>
+
+        </main>
+    </template>
+
+
+    <template id="community-hub-view">
+        <main class="p-4 sm:p-6 overflow-y-auto" style="padding-bottom: 5rem;">
+            
+            <header class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-extrabold font-title text-accent tracking-tight">Comunidade</h1>
+                <div class="flex items-center space-x-3">
+                    <label class="switch" id="themeToggleCommunity">
+                        <input class="switch__input" type="checkbox" role="switch">
+                        <svg class="switch__icon switch__icon--light" viewBox="0 0 12 12" width="12px" height="12px" aria-hidden="true">
+                            <g fill="none" stroke="#fff" stroke-width="1" stroke-linecap="round">
+                                <circle cx="6" cy="6" r="2" />
+                                <g stroke-dasharray="1.5 1.5">
+                                    <polyline points="6 10,6 11.5" transform="rotate(0,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(45,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(90,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(135,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(180,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(225,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(270,6,6)" />
+                                    <polyline points="6 10,6 11.5" transform="rotate(315,6,6)" />
+                                </g>
+                            </g>
+                        </svg>
+                        <svg class="switch__icon switch__icon--dark" viewBox="0 0 12 12" width="12px" height="12px" aria-hidden="true">
+                            <g fill="none" stroke="#fff" stroke-width="1" stroke-linejoin="round" transform="rotate(-45,6,6)">
+                                <path d="m9,10c-2.209,0-4-1.791-4-4s1.791-4,4-4c.304,0,.598.041.883.105-.995-.992-2.367-1.605-3.883-1.605C2.962.5.5,2.962.5,6s2.462,5.5,5.5,5.5c1.516,0,2.888-.613,3.883-1.605-.285.064-.578.105-.883.105Z"/>
+                            </g>    
+                        </svg>
+                        <span class="switch__sr">Dark Mode</span>
+                    </label>
+
+                    <button class="p-2 rounded-full text-text-secondary dark:text-dark-text-secondary hover:text-primary hover:bg-border-default dark:hover:bg-dark-border-default transition interactive-button" aria-label="Pesquisar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <h2 class="text-xl font-bold font-title mb-3 text-text-default dark:text-dark-text-default">Tópico Em Destaque</h2>
+            <a href="#" class="block mb-8 bg-bg-card dark:bg-dark-bg-card rounded-xl p-5 border-2 border-primary/50 shadow-lg topic-card interactive-card">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-semibold py-1 px-3 rounded-full text-white bg-primary shadow-glow-sm">
+                        EM ALTA: BARTIMEU
+                    </span>
+                    <span class="text-sm font-medium text-text-secondary dark:text-dark-text-secondary">há 2 minutos</span>
+                </div>
+                <h3 class="text-xl font-extrabold font-title mb-2 text-accent">
+                    O que significa "Largar a Capa"? Seu Manto te Segura?
+                </h3>
+                <p class="text-text-secondary dark:text-dark-text-secondary line-clamp-2 mb-3">
+                    A capa de Bartimeu era sua identidade. Qual "capa" precisamos largar para que Jesus nos chame? O que simboliza o "novo caminho" que ele seguiu?
+                </p>
+                <div class="flex items-center space-x-4 text-sm text-text-secondary dark:text-dark-text-secondary">
+                    <div class="flex items-center space-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9H7v2h2V9z" clip-rule="evenodd" />
+                        </svg>
+                        <span>145 Comentários</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        <span>32 Curtidas</span>
+                    </div>
+                </div>
+            </a>
+
+            <h2 class="text-xl font-bold font-title mb-3 text-text-default dark:text-dark-text-default">Outros Tópicos</h2>
+            <div class="space-y-4">
+                <a href="#" class="block bg-bg-card dark:bg-dark-bg-card rounded-xl p-4 border border-border-default dark:border-dark-border-default topic-card interactive-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold py-0.5 px-2 rounded-full text-secondary bg-secondary/20 dark:text-secondary dark:bg-secondary/10">
+                            Estudo de Livros
+                        </span>
+                        <span class="text-sm font-medium text-text-secondary dark:text-dark-text-secondary">1 dia atrás</span>
+                    </div>
+                    <h3 class="text-lg font-bold font-title mb-1 text-text-default dark:text-dark-text-default">
+                        Qual é o seu livro devocional favorito para as manhãs?
+                    </h3>
+                    <p class="text-text-secondary dark:text-dark-text-secondary line-clamp-2">
+                        Estou procurando algo novo para começar o dia com inspiração. Alguém tem recomendações de devocionais para a vida universitária ou o mercado de trabalho?
+                    </p>
+                    <div class="flex items-center space-x-4 text-sm text-text-secondary dark:text-dark-text-secondary mt-3">
+                        <div class="flex items-center space-x-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-secondary dark:text-secondary" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9H7v2h2V9z" clip-rule="evenodd" />
+                            </svg>
+                            <span>89 Comentários</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="#" class="block bg-bg-card dark:bg-dark-bg-card rounded-xl p-4 border border-border-default dark:border-dark-border-default topic-card interactive-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold py-0.5 px-2 rounded-full text-primary bg-primary/20">
+                            Perguntas ao Artista
+                        </span>
+                        <span class="text-sm font-medium text-text-secondary dark:text-dark-text-secondary">4 dias atrás</span>
+                    </div>
+                    <h3 class="text-lg font-bold font-title mb-1 text-text-default dark:text-dark-text-default">
+                        Live Q&A com 2METRO: Deixem suas perguntas aqui!
+                    </h3>
+                    <p class="text-text-secondary dark:text-dark-text-secondary line-clamp-2">
+                        Mande sua pergunta sobre os temas, a produção musical ou o significado bíblico de "Bartimeu". A Live será na próxima quarta-feira.
+                    </p>
+                    <div class="flex items-center space-x-4 text-sm text-text-secondary dark:text-dark-text-secondary mt-3">
+                        <div class="flex items-center space-x-1">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary dark:text-primary" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9H7v2h2V9z" clip-rule="evenodd" />
+                            </svg>
+                            <span>212 Comentários</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </main>
+    </template>
+
+
+    <script>
+        // Variável global para o elemento de áudio
+        let audioPlayer = null; 
+
+        // --- Funções de Ajuda ---
+        /**
+         * Converte segundos para o formato MM:SS.
+         * @param {number} seconds - O tempo em segundos.
+         * @returns {string} Tempo formatado (MM:SS).
+         */
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            const paddedMinutes = String(minutes).padStart(2, '0');
+            const paddedSeconds = String(remainingSeconds).padStart(2, '0');
+            return `${paddedMinutes}:${paddedSeconds}`;
+        }
+        
+        /**
+         * Atualiza o estado visual do botão Play/Pause (ícone).
+         * @param {boolean} isPlaying - Se a música está tocando.
+         */
+        function updatePlayPauseIcon(isPlaying) {
+            const playIcon = document.getElementById('playIcon');
+            const pauseIcon = document.getElementById('pauseIcon');
+            
+            if (playIcon && pauseIcon) {
+                if (isPlaying) {
+                    playIcon.classList.add('hidden');
+                    pauseIcon.classList.remove('hidden');
+                } else {
+                    playIcon.classList.remove('hidden');
+                    pauseIcon.classList.add('hidden');
+                }
+            }
+        }
+        
+        /**
+         * Atualiza a barra de progresso, tempo e duração.
+         */
+        function updateProgress() {
+            if (!audioPlayer) return;
+
+            const durationTime = document.getElementById('durationTime');
+            const currentTime = document.getElementById('currentTime');
+            const progressBarFill = document.getElementById('progressBarFill');
+            const progressThumb = document.getElementById('progressThumb');
+
+            const duration = audioPlayer.duration;
+            const current = audioPlayer.currentTime;
+
+            // Atualiza a duração total apenas quando estiver disponível (primeiro carregamento)
+            if (isFinite(duration) && durationTime.textContent === '00:00') {
+                durationTime.textContent = formatTime(duration);
+            }
+
+            // Atualiza o tempo atual
+            currentTime.textContent = formatTime(current);
+
+            // Calcula e atualiza a barra de progresso
+            if (isFinite(duration) && duration > 0) {
+                const percent = (current / duration) * 100;
+                
+                progressBarFill.style.width = `${percent}%`;
+                // Move o thumb (ajustando a posição para o centro dele)
+                progressThumb.style.left = `calc(${percent}% - 8px)`; 
+            }
+        }
+
+        // --- Lógica Principal do Player ---
+
+        /**
+         * Inicia ou pausa a reprodução de áudio.
+         * Esta função é anexada à janela para ser chamada pelo HTML clonado.
+         */
+        window.togglePlayPause = function() {
+            if (!audioPlayer) {
+                console.error('Player de áudio não inicializado.');
+                return;
+            }
+
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                updatePlayPauseIcon(true);
+            } else {
+                audioPlayer.pause();
+                updatePlayPauseIcon(false);
+            }
+        };
+
+        /**
+         * Inicializa o elemento de áudio e anexa os ouvintes de evento.
+         */
+        function initializeAudioPlayer() {
+            // Busca o player de áudio dentro do DOM atual
+            audioPlayer = document.getElementById('audioPlayer');
+            
+            if (!audioPlayer) {
+                // Se a view não for a do player, audioPlayer será nulo, o que é OK.
+                return;
+            }
+
+            // Garante que o ícone inicial esteja correto (Play, pois o áudio começa pausado)
+            updatePlayPauseIcon(false); 
+
+            // Ouvinte para a barra de progresso (atualização constante)
+            audioPlayer.addEventListener('timeupdate', updateProgress);
+
+            // Ouvinte para quando a música terminar
+            audioPlayer.addEventListener('ended', () => {
+                updatePlayPauseIcon(false);
+                audioPlayer.currentTime = 0; // Volta para o início
+                updateProgress();
+            });
+
+            // Ouvinte para carregar a duração correta ao carregar a mídia
+            audioPlayer.addEventListener('loadedmetadata', updateProgress);
+        }
+
+        // --- Lógica de Navegação e Tema (Mantida) ---
+        
+        const appContainer = document.getElementById('app-container');
+        const views = {
+            'player': document.getElementById('player-view'),
+            'community-hub': document.getElementById('community-hub-view')
+        };
+
+        function navigateTo(viewName) {
+            appContainer.innerHTML = '';
+            
+            // Limpa o player existente ao sair da view do player
+            if (audioPlayer && viewName !== 'player') {
+                audioPlayer.pause();
+                audioPlayer.removeEventListener('timeupdate', updateProgress);
+            }
+            audioPlayer = null; // Zera a referência
+
+            const template = views[viewName];
+            if (template) {
+                const content = document.importNode(template.content, true);
+                appContainer.appendChild(content);
+
+                // ** IMPORTANTE: Inicializa o player DEPOIS de carregar a view.
+                if (viewName === 'player') {
+                    initializeAudioPlayer();
+                }
+
+                initializeThemeToggles();
+                updateActiveNavButton(viewName);
+
+            } else {
+                updateActiveNavButton(viewName);
+            }
+        }
+        
+        function updateActiveNavButton(activeViewName) {
+            document.querySelectorAll('nav button').forEach(button => {
+                const viewName = button.getAttribute('data-view');
+                if (viewName === activeViewName || (activeViewName === 'player' && viewName === 'player-alt') || (activeViewName === 'player' && viewName === 'market') ) {
+                    button.classList.add('text-primary');
+                    button.classList.remove('text-text-secondary/80', 'dark:text-dark-text-secondary/80');
+                } else {
+                    button.classList.remove('text-primary');
+                    button.classList.add('text-text-secondary/80', 'dark:text-dark-text-secondary/80');
+                }
+            });
+        }
+
+        function applyTheme(isDark, updateCheckbox = true) {
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            }
+
+            if (updateCheckbox) {
+                document.querySelectorAll('.switch__input').forEach(input => {
+                    input.checked = isDark;
+                });
+            }
+        }
+
+        function initializeThemeToggles() {
+            document.querySelectorAll('.switch__input').forEach(input => {
+                input.removeEventListener('change', handleThemeChange); 
+                input.addEventListener('change', handleThemeChange);
+            });
+        }
+        
+        function handleThemeChange(event) {
+            const isDark = event.target.checked;
+            applyTheme(isDark, false); 
+            
+            document.querySelectorAll('.switch__input').forEach(otherInput => {
+                 if (otherInput !== event.target) {
+                    otherInput.checked = isDark;
+                }
+            });
+        }
+
+        // --- Inicialização ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Carrega o tema
+            const savedTheme = localStorage.getItem('theme');
+            const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            let initialIsDark = false;
+            if (savedTheme === 'dark') {
+                initialIsDark = true;
+            } else if (savedTheme === 'light') {
+                initialIsDark = false;
+            } else if (isSystemDark) {
+                initialIsDark = true;
+            } 
+            
+            applyTheme(initialIsDark, true); 
+
+            // 2. Carrega a view inicial ('player')
+            navigateTo('player'); 
+        });
+
+    </script>
+</body>
+</html>
