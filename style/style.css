@@ -1,86 +1,82 @@
-/* --- Novo Toggle Switch CSS --- */
-.switch {
-    --switch-bg-light: #6366F1; /* Primary do Portfólio */
-    --switch-bg-dark: #18181B; /* Dark Card BG */
-    --switch-circle: #fff;
-    --switch-icon-inactive: #A5B4FC; /* Accent do Portfólio */
-    --switch-icon-active: #fff;
-    --switch-duration: 0.25s;
-    
-    display: inline-flex;
-    position: relative;
-    cursor: pointer;
-    background-color: var(--switch-bg-light);
-    border-radius: 999px;
-    height: 32px;
-    width: 60px;
-    transition: background-color var(--switch-duration) ease-out;
-}
-.switch__input {
-    position: absolute;
-    width: 0;
-    height: 0;
-    opacity: 0;
-}
-.switch__icon {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    fill: none;
-    pointer-events: none;
-    transition: opacity var(--switch-duration) ease-out;
-}
-/* Estilo do círculo/thumb */
-.switch::before {
-    content: '';
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background-color: var(--switch-circle);
-    transition: transform var(--switch-duration) cubic-bezier(0.785, 0.135, 0.15, 0.86);
+/* ---- Ajustes globais do toggle ---- */
+
+.toggle-container {
+  position: relative;
+  width: 210px;
+  height: 50px;
+  padding: 3px;
+  background: #0d0d0d;
+  border-radius: 6px;
+  box-shadow: inset 0 1px 1px 1px rgba(0, 0, 0, 0.5),
+              0 1px 0 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Posição inicial (Light Mode / Desmarcado) */
-.switch__icon--light {
-    left: 10px;
-    color: var(--switch-icon-active);
-    opacity: 1;
-}
-.switch__icon--dark {
-    right: 10px;
-    color: var(--switch-icon-inactive);
-    opacity: 0;
+.toggle-inner {
+  position: relative;
+  display: block;
+  width: 50%;
+  height: 100%;
+  background: #1b1c1c;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.5s ease-in-out;
 }
 
-/* Estado Ativo (Dark Mode / Marcado) */
-.switch__input:checked + .switch__icon--light {
-    opacity: 0;
+.toggle-inner::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 10px;
+  background: #fff;
+  border-radius: 50%;
+  vertical-align: middle;
+  /* glow vermelho */
+  box-shadow: 0 0 5px 2px rgba(165, 15, 15, 0.9),
+              0 0 3px 1px rgba(165, 15, 15, 0.9);
+  transition: all 0.5s ease-in-out;
 }
-.switch__input:checked + .switch__icon--dark {
-    opacity: 1;
-}
-.switch__input:checked ~ .switch::before {
-    transform: translateX(28px);
-}
-.switch__input:checked ~ .switch {
-    background-color: var(--switch-bg-dark);
-}
-/* Acessibilidade */
-.switch__sr {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-}
-/* --- Fim do Novo Toggle Switch CSS --- */
 
+.toggle-inner i {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 24px;
+  background: #0d0d0d;
+  border-radius: 2px;
+  margin-top: -12px;
+  margin-left: -1.5px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
 
+.toggle-inner i::before,
+.toggle-inner i::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #0d0d0d;
+  border-radius: 2px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
 
+.toggle-inner i::before {
+  left: -7px;
+}
+
+.toggle-inner i::after {
+  left: 7px;
+}
+
+/* ---- Estado ativado ---- */
+.toggle-input:checked + .toggle-inner {
+  left: 50%;
+}
+
+.toggle-input:checked + .toggle-inner::before {
+  /* glow verde */
+  box-shadow: 0 0 5px 2px rgba(15, 165, 70, 0.9),
+              0 0 3px 1px rgba(15, 165, 70, 0.9);
+}
