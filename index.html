@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Música e Devocional (UX Design Thinking)</title>
+    <title>App Música e Devocional (Estética do Portfólio)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style/style.css">
-    
     <script>
         tailwind.config = {
             darkMode: 'class', 
@@ -279,30 +278,60 @@
                         </svg>
                     </button>
                     
-                    <label class="switch" id="themeTogglePlayer">
-                        <input class="switch__input" type="checkbox" role="switch">
-                        <svg class="switch__icon switch__icon--light" viewBox="0 0 12 12" width="12px" height="12px" aria-hidden="true">
-                            <g fill="none" stroke="#fff" stroke-width="1" stroke-linecap="round">
-                                <circle cx="6" cy="6" r="2" />
-                                <g stroke-dasharray="1.5 1.5">
-                                    <polyline points="6 10,6 11.5" transform="rotate(0,6,6)" />
-                                    <polyline points="6 10,6 11.5" transform="rotate(45,6,6)" />
-                                    <polyline points="6 10,6 11.5" transform="rotate(90,6,6)" />
-                                    <polyline points="6 10,6 11.5" transform="rotate(135,6,6)" />
-                                    <polyline points="6 10,6 11.5" transform="rotate(180,6,6)" />
-                                    <polyline points="6 10,6 11.5" transform="rotate(225,6,6)" />
-                                    <polyline points="6 10,6 11.5" transform="rotate(270,6,6)" />
-                                    <polyline points="6 10,6 11.5" transform="rotate(315,6,6)" />
-                                </g>
-                            </g>
-                        </svg>
-                        <svg class="switch__icon switch__icon--dark" viewBox="0 0 12 12" width="12px" height="12px" aria-hidden="true">
-                            <g fill="none" stroke="#fff" stroke-width="1" stroke-linejoin="round" transform="rotate(-45,6,6)">
-                                <path d="m9,10c-2.209,0-4-1.791-4-4s1.791-4,4-4c.304,0,.598.041.883.105-.995-.992-2.367-1.605-3.883-1.605C2.962.5.5,2.962.5,6s2.462,5.5,5.5,5.5c1.516,0,2.888-.613,3.883-1.605-.285.064-.578.105-.883.105Z"/>
-                            </g>    
-                        </svg>
-                        <span class="switch__sr">Dark Mode</span>
-                    </label>
+<!-- THEME TOGGLE -->
+<label class="relative inline-flex items-center cursor-pointer group">
+  
+  <!-- INPUT -->
+  <input type="checkbox" id="themeToggle" class="sr-only peer">
+
+  <!-- TRACK (fundo do toggle) -->
+  <div
+    class="w-14 h-8 rounded-full 
+           bg-gradient-to-r from-yellow-400 to-indigo-300
+           peer-checked:from-indigo-500 peer-checked:to-violet-500
+           transition-all duration-300 shadow-inner">
+  </div>
+
+  <!-- THUMB (bolinha que desliza) -->
+  <span
+    class="absolute left-1 top-1 w-6 h-6 rounded-full 
+           bg-white dark:bg-dark-bg-default
+           peer-checked:translate-x-6 transform transition-all duration-300 shadow
+           flex items-center justify-center">
+
+    <!-- ÍCONE SOL -->
+    <svg
+      class="w-4 h-4 text-yellow-400 opacity-100 
+             peer-checked:opacity-0 transition-opacity duration-200"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4"/>
+      <g stroke-linecap="round">
+        <line x1="12" y1="1" x2="12" y2="4"/>
+        <line x1="12" y1="20" x2="12" y2="23"/>
+        <line x1="4.2" y1="4.2" x2="6.3" y2="6.3"/>
+        <line x1="17.7" y1="17.7" x2="19.8" y2="19.8"/>
+        <line x1="1" y1="12" x2="4" y2="12"/>
+        <line x1="20" y1="12" x2="23" y2="12"/>
+        <line x1="4.2" y1="19.8" x2="6.3" y2="17.7"/>
+        <line x1="17.7" y1="6.3" x2="19.8" y2="4.2"/>
+      </g>
+    </svg>
+
+    <!-- ÍCONE LUA -->
+    <svg
+      class="w-4 h-4 text-indigo-300 opacity-0 
+             peer-checked:opacity-100 transition-opacity duration-200"
+      fill="currentColor"
+      viewBox="0 0 20 20">
+      <path d="M17.293 13.293A8 8 0 018.707 2.707a8.001 8.001 0 108.586 10.586z"/>
+    </svg>
+
+  </span>
+
+</label>
                 </div>
             </header>
 
@@ -529,232 +558,207 @@
 
 
     <script>
-        // Variável global para o elemento de áudio
-        let audioPlayer = null; 
+        // =========================================
+// 🔊 PLAYER DE ÁUDIO
+// =========================================
 
-        // --- Funções de Ajuda ---
-        /**
-         * Converte segundos para o formato MM:SS.
-         * @param {number} seconds - O tempo em segundos.
-         * @returns {string} Tempo formatado (MM:SS).
-         */
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = Math.floor(seconds % 60);
-            const paddedMinutes = String(minutes).padStart(2, '0');
-            const paddedSeconds = String(remainingSeconds).padStart(2, '0');
-            return `${paddedMinutes}:${paddedSeconds}`;
+// Variável global para o elemento de áudio
+let audioPlayer = null;
+
+// --- Funções de Ajuda ---
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    const paddedMinutes = String(minutes).padStart(2, "0");
+    const paddedSeconds = String(remainingSeconds).padStart(2, "0");
+    return `${paddedMinutes}:${paddedSeconds}`;
+}
+
+function updatePlayPauseIcon(isPlaying) {
+    const playIcon = document.getElementById("playIcon");
+    const pauseIcon = document.getElementById("pauseIcon");
+
+    if (playIcon && pauseIcon) {
+        if (isPlaying) {
+            playIcon.classList.add("hidden");
+            pauseIcon.classList.remove("hidden");
+        } else {
+            playIcon.classList.remove("hidden");
+            pauseIcon.classList.add("hidden");
         }
-        
-        /**
-         * Atualiza o estado visual do botão Play/Pause (ícone).
-         * @param {boolean} isPlaying - Se a música está tocando.
-         */
-        function updatePlayPauseIcon(isPlaying) {
-            const playIcon = document.getElementById('playIcon');
-            const pauseIcon = document.getElementById('pauseIcon');
-            
-            if (playIcon && pauseIcon) {
-                if (isPlaying) {
-                    playIcon.classList.add('hidden');
-                    pauseIcon.classList.remove('hidden');
-                } else {
-                    playIcon.classList.remove('hidden');
-                    pauseIcon.classList.add('hidden');
-                }
-            }
-        }
-        
-        /**
-         * Atualiza a barra de progresso, tempo e duração.
-         */
-        function updateProgress() {
-            if (!audioPlayer) return;
+    }
+}
 
-            const durationTime = document.getElementById('durationTime');
-            const currentTime = document.getElementById('currentTime');
-            const progressBarFill = document.getElementById('progressBarFill');
-            const progressThumb = document.getElementById('progressThumb');
+function updateProgress() {
+    if (!audioPlayer) return;
 
-            const duration = audioPlayer.duration;
-            const current = audioPlayer.currentTime;
+    const durationTime = document.getElementById("durationTime");
+    const currentTime = document.getElementById("currentTime");
+    const progressBarFill = document.getElementById("progressBarFill");
+    const progressThumb = document.getElementById("progressThumb");
 
-            // Atualiza a duração total apenas quando estiver disponível (primeiro carregamento)
-            if (isFinite(duration) && durationTime.textContent === '00:00') {
-                durationTime.textContent = formatTime(duration);
-            }
+    const duration = audioPlayer.duration;
+    const current = audioPlayer.currentTime;
 
-            // Atualiza o tempo atual
-            currentTime.textContent = formatTime(current);
+    if (isFinite(duration) && durationTime.textContent === "00:00") {
+        durationTime.textContent = formatTime(duration);
+    }
 
-            // Calcula e atualiza a barra de progresso
-            if (isFinite(duration) && duration > 0) {
-                const percent = (current / duration) * 100;
-                
-                progressBarFill.style.width = `${percent}%`;
-                // Move o thumb (ajustando a posição para o centro dele)
-                progressThumb.style.left = `calc(${percent}% - 8px)`; 
-            }
-        }
+    currentTime.textContent = formatTime(current);
 
-        // --- Lógica Principal do Player ---
+    if (isFinite(duration) && duration > 0) {
+        const percent = (current / duration) * 100;
 
-        /**
-         * Inicia ou pausa a reprodução de áudio.
-         * Esta função é anexada à janela para ser chamada pelo HTML clonado.
-         */
-        window.togglePlayPause = function() {
-            if (!audioPlayer) {
-                console.error('Player de áudio não inicializado.');
-                return;
-            }
+        progressBarFill.style.width = `${percent}%`;
+        progressThumb.style.left = `calc(${percent}% - 8px)`;
+    }
+}
 
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-                updatePlayPauseIcon(true);
-            } else {
-                audioPlayer.pause();
-                updatePlayPauseIcon(false);
-            }
-        };
+// --- Lógica Principal do Player ---
+window.togglePlayPause = function () {
+    if (!audioPlayer) return;
 
-        /**
-         * Inicializa o elemento de áudio e anexa os ouvintes de evento.
-         */
-        function initializeAudioPlayer() {
-            // Busca o player de áudio dentro do DOM atual
-            audioPlayer = document.getElementById('audioPlayer');
-            
-            if (!audioPlayer) {
-                // Se a view não for a do player, audioPlayer será nulo, o que é OK.
-                return;
-            }
+    if (audioPlayer.paused) {
+        audioPlayer.play();
+        updatePlayPauseIcon(true);
+    } else {
+        audioPlayer.pause();
+        updatePlayPauseIcon(false);
+    }
+};
 
-            // Garante que o ícone inicial esteja correto (Play, pois o áudio começa pausado)
-            updatePlayPauseIcon(false); 
+function initializeAudioPlayer() {
+    audioPlayer = document.getElementById("audioPlayer");
 
-            // Ouvinte para a barra de progresso (atualização constante)
-            audioPlayer.addEventListener('timeupdate', updateProgress);
+    if (!audioPlayer) return;
 
-            // Ouvinte para quando a música terminar
-            audioPlayer.addEventListener('ended', () => {
-                updatePlayPauseIcon(false);
-                audioPlayer.currentTime = 0; // Volta para o início
-                updateProgress();
-            });
+    updatePlayPauseIcon(false);
 
-            // Ouvinte para carregar a duração correta ao carregar a mídia
-            audioPlayer.addEventListener('loadedmetadata', updateProgress);
+    audioPlayer.addEventListener("timeupdate", updateProgress);
+
+    audioPlayer.addEventListener("ended", () => {
+        updatePlayPauseIcon(false);
+        audioPlayer.currentTime = 0;
+        updateProgress();
+    });
+
+    audioPlayer.addEventListener("loadedmetadata", updateProgress);
+}
+
+// =========================================
+// 🔄 NAVEGAÇÃO ENTRE VIEWS
+// =========================================
+
+const appContainer = document.getElementById("app-container");
+const views = {
+    player: document.getElementById("player-view"),
+    "community-hub": document.getElementById("community-hub-view"),
+};
+
+function navigateTo(viewName) {
+    appContainer.innerHTML = "";
+
+    if (audioPlayer && viewName !== "player") {
+        audioPlayer.pause();
+        audioPlayer.removeEventListener("timeupdate", updateProgress);
+    }
+    audioPlayer = null;
+
+    const template = views[viewName];
+    if (template) {
+        const content = document.importNode(template.content, true);
+        appContainer.appendChild(content);
+
+        if (viewName === "player") {
+            initializeAudioPlayer();
         }
 
-        // --- Lógica de Navegação e Tema (Mantida) ---
-        
-        const appContainer = document.getElementById('app-container');
-        const views = {
-            'player': document.getElementById('player-view'),
-            'community-hub': document.getElementById('community-hub-view')
-        };
+        initializeThemeToggle();
+        updateActiveNavButton(viewName);
+    } else {
+        updateActiveNavButton(viewName);
+    }
+}
 
-        function navigateTo(viewName) {
-            appContainer.innerHTML = '';
-            
-            // Limpa o player existente ao sair da view do player
-            if (audioPlayer && viewName !== 'player') {
-                audioPlayer.pause();
-                audioPlayer.removeEventListener('timeupdate', updateProgress);
-            }
-            audioPlayer = null; // Zera a referência
+function updateActiveNavButton(active) {
+    document.querySelectorAll("nav button").forEach((button) => {
+        const view = button.getAttribute("data-view");
 
-            const template = views[viewName];
-            if (template) {
-                const content = document.importNode(template.content, true);
-                appContainer.appendChild(content);
-
-                // ** IMPORTANTE: Inicializa o player DEPOIS de carregar a view.
-                if (viewName === 'player') {
-                    initializeAudioPlayer();
-                }
-
-                initializeThemeToggles();
-                updateActiveNavButton(viewName);
-
-            } else {
-                updateActiveNavButton(viewName);
-            }
+        if (
+            view === active ||
+            (active === "player" && view === "player-alt") ||
+            (active === "player" && view === "market")
+        ) {
+            button.classList.add("text-primary");
+            button.classList.remove(
+                "text-text-secondary/80",
+                "dark:text-dark-text-secondary/80"
+            );
+        } else {
+            button.classList.remove("text-primary");
+            button.classList.add(
+                "text-text-secondary/80",
+                "dark:text-dark-text-secondary/80"
+            );
         }
-        
-        function updateActiveNavButton(activeViewName) {
-            document.querySelectorAll('nav button').forEach(button => {
-                const viewName = button.getAttribute('data-view');
-                if (viewName === activeViewName || (activeViewName === 'player' && viewName === 'player-alt') || (activeViewName === 'player' && viewName === 'market') ) {
-                    button.classList.add('text-primary');
-                    button.classList.remove('text-text-secondary/80', 'dark:text-dark-text-secondary/80');
-                } else {
-                    button.classList.remove('text-primary');
-                    button.classList.add('text-text-secondary/80', 'dark:text-dark-text-secondary/80');
-                }
-            });
-        }
+    });
+}
 
-        function applyTheme(isDark, updateCheckbox = true) {
-            if (isDark) {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            }
+// =========================================
+// 🌑/☀️ NOVO SISTEMA DE TEMA (TOGGLE)
+// =========================================
 
-            if (updateCheckbox) {
-                document.querySelectorAll('.switch__input').forEach(input => {
-                    input.checked = isDark;
-                });
-            }
-        }
+function applyTheme(theme) {
+    if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+    } else {
+        document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme);
 
-        function initializeThemeToggles() {
-            document.querySelectorAll('.switch__input').forEach(input => {
-                input.removeEventListener('change', handleThemeChange); 
-                input.addEventListener('change', handleThemeChange);
-            });
-        }
-        
-        function handleThemeChange(event) {
-            const isDark = event.target.checked;
-            applyTheme(isDark, false); 
-            
-            document.querySelectorAll('.switch__input').forEach(otherInput => {
-                 if (otherInput !== event.target) {
-                    otherInput.checked = isDark;
-                }
-            });
-        }
+    const toggle = document.getElementById("themeToggle");
+    if (toggle) toggle.checked = theme === "dark";
+}
 
-        // --- Inicialização ---
+function initializeThemeToggle() {
+    const toggle = document.getElementById("themeToggle");
+    if (!toggle) return;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. Carrega o tema
-            const savedTheme = localStorage.getItem('theme');
-            const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            let initialIsDark = false;
-            if (savedTheme === 'dark') {
-                initialIsDark = true;
-            } else if (savedTheme === 'light') {
-                initialIsDark = false;
-            } else if (isSystemDark) {
-                initialIsDark = true;
-            } 
-            
-            applyTheme(initialIsDark, true); 
+    // Ajusta baseado no tema atual
+    toggle.checked =
+        document.documentElement.classList.contains("dark");
 
-            // 2. Carrega a view inicial ('player')
-            navigateTo('player'); 
-        });
+    // Evento
+    toggle.addEventListener("change", () => {
+        applyTheme(toggle.checked ? "dark" : "light");
+    });
+}
+
+// Listener do sistema operacional
+window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", (e) => {
+        applyTheme(e.matches ? "dark" : "light");
+    });
+
+// =========================================
+// 🚀 INICIALIZAÇÃO GERAL
+// =========================================
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Tema inicial
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+    ).matches;
+
+    applyTheme(savedTheme || (prefersDark ? "dark" : "light"));
+
+    // View padrão
+    navigateTo("player");
+});
+
 
     </script>
 </body>
-
 </html>
-
-
